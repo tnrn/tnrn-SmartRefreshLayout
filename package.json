@@ -1,5 +1,5 @@
 {
-  "name": "react-native-smartrefreshlayout",
+  "name": "tnrn-smartrefreshlayout",
   "version": "0.6.7",
   "description": "基于android SmartRefreshLayout的封装",
   "main": "index.js",
