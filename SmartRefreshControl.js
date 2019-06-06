@@ -39,6 +39,11 @@ class SmartRefreshControl extends Component {
     finishRefresh=({delayed=-1,success=true}={delayed:-1,success:true})=>{
         this.dispatchCommand('finishRefresh',[delayed,success])
     }
+
+    finishLoadMore=({hasMore = true, success=true})=>{
+        this.dispatchCommand('finishLoadMore',[hasMore,success])
+    }
+
     dispatchCommand=(commandName, params)=>{
         UIManager.dispatchViewManagerCommand(this.findNode(),
             (UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig("SmartRefreshLayout"): UIManager.SmartRefreshLayout).Commands[commandName],
@@ -112,7 +117,9 @@ class SmartRefreshControl extends Component {
      * @private
      */
     _onFooterMoving=(event)=>{
+        const { onFooterPulling } = this.props;
         this.footerShiftPercent = event.nativeEvent.percent;
+        onFooterPulling && onFooterPulling(event);
     }
 
     render() {
@@ -163,6 +170,7 @@ SmartRefreshControl.propTypes = {
         refresh:PropTypes.bool,
         time:PropTypes.number,
     }),//是否启动自动刷新
+    enableLoadMore: PropTypes.bool, // 是否显示加载更多
     ...ViewPropTypes,
 }
 

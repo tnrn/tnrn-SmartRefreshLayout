@@ -1,6 +1,6 @@
 {
   "name": "tnrn-smartrefreshlayout",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "description": "基于android SmartRefreshLayout的封装",
   "main": "index.js",
   "scripts": {

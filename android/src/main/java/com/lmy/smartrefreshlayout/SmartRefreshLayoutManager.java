@@ -2,6 +2,7 @@ package com.lmy.smartrefreshlayout;
 
 import android.graphics.Color;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
@@ -17,6 +18,8 @@ import com.scwang.smartrefresh.layout.api.RefreshFooter;
 import com.scwang.smartrefresh.layout.api.RefreshHeader;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.RefreshState;
+import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.scwang.smartrefresh.layout.listener.SimpleMultiPurposeListener;
 import com.scwang.smartrefresh.layout.util.DensityUtil;
@@ -43,6 +46,9 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
     private static final String COMMAND_FINISH_REFRESH_NAME="finishRefresh";
     private static final int COMMAND_FINISH_REFRESH_ID=0;
 
+    private static final String COMMAND_FINISH_LOAD_MORE_NAME="finishLoadMore";
+    private static final int COMMAND_FINISH_LOAD_MORE_ID=1;
+
     @Override
     public String getName() {
         return REACT_CLASS;
@@ -51,7 +57,14 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
     @Override
     protected ReactSmartRefreshLayout createViewInstance(ThemedReactContext reactContext) {
         smartRefreshLayout=new ReactSmartRefreshLayout(reactContext);
-        smartRefreshLayout.setEnableLoadMore(false);//暂时禁止上拉加载
+        //暂时禁止上拉加载
+        smartRefreshLayout.setEnableLoadMore(false);
+        smartRefreshLayout.setFooterMaxDragRate(2);
+        ClassicsFooter footer = new ClassicsFooter(reactContext);
+        footer.setArrowResource(android.R.color.transparent);
+        smartRefreshLayout.setRefreshFooter(footer);
+        smartRefreshLayout.setEnableLoadMoreWhenContentNotFull(false);
+        smartRefreshLayout.setEnableAutoLoadMore(false);
         themedReactContext=reactContext;
         mEventEmitter=reactContext.getJSModule(RCTEventEmitter.class);
         return smartRefreshLayout;
@@ -70,7 +83,8 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
     @Override
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.of(
-                COMMAND_FINISH_REFRESH_NAME,COMMAND_FINISH_REFRESH_ID
+                COMMAND_FINISH_REFRESH_NAME,COMMAND_FINISH_REFRESH_ID,
+                COMMAND_FINISH_LOAD_MORE_NAME, COMMAND_FINISH_LOAD_MORE_ID
         );
     }
     /**
@@ -171,6 +185,13 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
             }
         }
     }
+
+
+    @ReactProp(name="enableLoadMore", defaultBoolean = false)
+    public void setEnableLoadMore(ReactSmartRefreshLayout view, boolean enableLoadMore) {
+        view.setEnableLoadMore(enableLoadMore);
+    }
+
     @Override
     public void receiveCommand(ReactSmartRefreshLayout root, int commandId, @Nullable ReadableArray args) {
         switch (commandId){
@@ -181,6 +202,20 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
                     root.finishRefresh(delayed,success);
                 }else{
                     root.finishRefresh(success);
+                }
+                root.setNoMoreData(false);
+                break;
+            case COMMAND_FINISH_LOAD_MORE_ID:
+                boolean hasMore = args.getBoolean(0);
+                boolean loadMoreSuccess = args.getBoolean(1);
+                if (loadMoreSuccess) {
+                    if (hasMore) {
+                        root.finishLoadMore();
+                    } else {
+                        root.finishLoadMoreWithNoMoreData();
+                    }
+                } else {
+                    root.finishLoadMore(false);
                 }
                 break;
             default:break;
@@ -204,10 +239,11 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
             case 1:
                 parent.setRefreshContent(child);
                 break;
-            case 2:
-                //RefreshFooter footer=(RefreshFooter)child;
-                //parent.setRefreshFooter(footer);
-                break;
+//            case 2:
+////                RefreshFooter footer=(RefreshFooter)child;
+//                ClassicsFooter footer = new ClassicsFooter(themedReactContext);
+//                parent.setRefreshFooter(footer);
+//                break;
             default:break;
 
         }
@@ -235,6 +271,14 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
 
             }
         });
+
+        view.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(RefreshLayout refreshLayout) {
+
+            }
+        });
+
         view.setOnMultiPurposeListener(new SimpleMultiPurposeListener() {
             private int getTargetId(){
                 return view.getId();
