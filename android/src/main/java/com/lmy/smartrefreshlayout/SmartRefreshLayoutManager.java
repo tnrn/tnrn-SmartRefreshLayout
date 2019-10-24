@@ -58,13 +58,13 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
     protected ReactSmartRefreshLayout createViewInstance(ThemedReactContext reactContext) {
         smartRefreshLayout=new ReactSmartRefreshLayout(reactContext);
         //暂时禁止上拉加载
-        smartRefreshLayout.setEnableLoadMore(false);
-        smartRefreshLayout.setFooterMaxDragRate(2);
+        smartRefreshLayout.getSmartRefreshLayout().setEnableLoadMore(false);
+        smartRefreshLayout.getSmartRefreshLayout().setFooterMaxDragRate(2);
         ClassicsFooter footer = new ClassicsFooter(reactContext);
         footer.setArrowResource(android.R.color.transparent);
-        smartRefreshLayout.setRefreshFooter(footer);
-        smartRefreshLayout.setEnableLoadMoreWhenContentNotFull(false);
-        smartRefreshLayout.setEnableAutoLoadMore(false);
+        smartRefreshLayout.getSmartRefreshLayout().setRefreshFooter(footer);
+        smartRefreshLayout.getSmartRefreshLayout().setEnableLoadMoreWhenContentNotFull(false);
+        smartRefreshLayout.getSmartRefreshLayout().setEnableAutoLoadMore(false);
         themedReactContext=reactContext;
         mEventEmitter=reactContext.getJSModule(RCTEventEmitter.class);
         return smartRefreshLayout;
@@ -94,7 +94,7 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
      */
     @ReactProp(name="maxDragRate",defaultFloat = 2.0f)
     public void setMaxDragRate(ReactSmartRefreshLayout view,float maxDragRate){
-        view.setHeaderMaxDragRate(maxDragRate);
+        view.getSmartRefreshLayout().setHeaderMaxDragRate(maxDragRate);
     }
     /**
      * 显示下拉高度/手指真实下拉高度=阻尼效果
@@ -103,7 +103,7 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
      */
     @ReactProp(name = "dragRate",defaultFloat = 0.5f)
     public void setDragRate(ReactSmartRefreshLayout view,float dragRate){
-        view.setDragRate(dragRate);
+        view.getSmartRefreshLayout().setDragRate(dragRate);
     }
     /**
      * 是否使用越界拖动
@@ -112,7 +112,7 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
      */
     @ReactProp(name="overScrollDrag",defaultBoolean = true)
     public void setOverScrollDrag(ReactSmartRefreshLayout view,boolean overScrollDrag){
-        view.setEnableOverScrollDrag(overScrollDrag);
+        view.getSmartRefreshLayout().setEnableOverScrollDrag(overScrollDrag);
     }
     /**
      * 是否启用越界回弹
@@ -121,7 +121,7 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
      */
     @ReactProp(name = "overScrollBounce",defaultBoolean = true)
     public void setOverScrollBounce(ReactSmartRefreshLayout view,boolean overScrollBounce){
-        view.setEnableOverScrollBounce(overScrollBounce);
+        view.getSmartRefreshLayout().setEnableOverScrollBounce(overScrollBounce);
     }
     /**
      * 设置为纯滚动
@@ -130,7 +130,7 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
      */
     @ReactProp(name = "pureScroll",defaultBoolean = false)
     public void setPureScroll(ReactSmartRefreshLayout view,boolean pureScroll){
-        view.setEnablePureScrollMode(pureScroll);
+        view.getSmartRefreshLayout().setEnablePureScrollMode(pureScroll);
     }
     /**
      * 通过RefreshLayout设置主题色
@@ -139,7 +139,7 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
      */
     @ReactProp(name = "primaryColor",defaultInt = Color.TRANSPARENT)
     public void setPrimaryColor(ReactSmartRefreshLayout view, int primaryColor){
-        view.setPrimaryColors(primaryColor);
+        view.getSmartRefreshLayout().setPrimaryColors(primaryColor);
     }
     /**
      * 设置headerHeight
@@ -149,7 +149,7 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
     @ReactProp(name = "headerHeight")
     public void setHeaderHeight(ReactSmartRefreshLayout view,float headerHeight){
         if(headerHeight != 0.0f) {
-            view.setHeaderHeight(headerHeight);
+            view.getSmartRefreshLayout().setHeaderHeight(headerHeight);
 
         }
     }
@@ -160,7 +160,7 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
      */
     @ReactProp(name="enableRefresh",defaultBoolean = true)
     public void setEnableRefresh(ReactSmartRefreshLayout view,boolean enableRefresh){
-        view.setEnableRefresh(enableRefresh);
+        view.getSmartRefreshLayout().setEnableRefresh(enableRefresh);
     }
 
     /**
@@ -179,9 +179,9 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
         }
         if(isAutoRefresh==true){
             if(time!=null && time>0){
-                view.autoRefresh(time);
+                view.getSmartRefreshLayout().autoRefresh(time);
             }else{
-                view.autoRefresh();
+                view.getSmartRefreshLayout().autoRefresh();
             }
         }
     }
@@ -189,7 +189,7 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
 
     @ReactProp(name="enableLoadMore", defaultBoolean = false)
     public void setEnableLoadMore(ReactSmartRefreshLayout view, boolean enableLoadMore) {
-        view.setEnableLoadMore(enableLoadMore);
+        view.getSmartRefreshLayout().setEnableLoadMore(enableLoadMore);
     }
 
     @Override
@@ -199,23 +199,23 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
                 int delayed=args.getInt(0);
                 boolean success=args.getBoolean(1);
                 if(delayed>=0){
-                    root.finishRefresh(delayed,success);
+                    root.getSmartRefreshLayout().finishRefresh(delayed,success);
                 }else{
-                    root.finishRefresh(success);
+                    root.getSmartRefreshLayout().finishRefresh(success);
                 }
-                root.setNoMoreData(false);
+                root.getSmartRefreshLayout().setNoMoreData(false);
                 break;
             case COMMAND_FINISH_LOAD_MORE_ID:
                 boolean hasMore = args.getBoolean(0);
                 boolean loadMoreSuccess = args.getBoolean(1);
                 if (loadMoreSuccess) {
                     if (hasMore) {
-                        root.finishLoadMore();
+                        root.getSmartRefreshLayout().finishLoadMore();
                     } else {
-                        root.finishLoadMoreWithNoMoreData();
+                        root.getSmartRefreshLayout().finishLoadMoreWithNoMoreData();
                     }
                 } else {
-                    root.finishLoadMore(false);
+                    root.getSmartRefreshLayout().finishLoadMore(false);
                 }
                 break;
             default:break;
@@ -233,11 +233,11 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
                     header=new AnyHeader(themedReactContext);
                     ((AnyHeader)header).setView(child);
                 }
-                parent.setRefreshHeader(header);
+                parent.getSmartRefreshLayout().setRefreshHeader(header);
                 //parent.setRefreshHeader(new MaterialHeader(themedReactContext).setShowBezierWave(true));
                 break;
             case 1:
-                parent.setRefreshContent(child);
+                parent.getSmartRefreshLayout().setRefreshContent(child);
                 break;
 //            case 2:
 ////                RefreshFooter footer=(RefreshFooter)child;
@@ -265,21 +265,21 @@ public class SmartRefreshLayoutManager extends ViewGroupManager<ReactSmartRefres
          * OnRefreshListener和OnSimpleMultiPurposeListener
          * 中的onRefresh都会触发刷新，只需写一个即可
          */
-        view.setOnRefreshListener(new OnRefreshListener() {
+        view.getSmartRefreshLayout().setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshLayout) {
 
             }
         });
 
-        view.setOnLoadMoreListener(new OnLoadMoreListener() {
+        view.getSmartRefreshLayout().setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore(RefreshLayout refreshLayout) {
 
             }
         });
 
-        view.setOnMultiPurposeListener(new SimpleMultiPurposeListener() {
+        view.getSmartRefreshLayout().setOnMultiPurposeListener(new SimpleMultiPurposeListener() {
             private int getTargetId(){
                 return view.getId();
             }
